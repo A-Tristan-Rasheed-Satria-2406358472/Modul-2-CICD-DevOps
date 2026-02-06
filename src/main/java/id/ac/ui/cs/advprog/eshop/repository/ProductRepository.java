@@ -13,14 +13,34 @@ import id.ac.ui.cs.advprog.eshop.model.Product;
 public class ProductRepository {
 
     private List<Product> productData = new ArrayList<>();
+    private int nextId = 1;
 
     public Product create(Product product) {
+        product.setProductId(nextId++);
         productData.add(product);
         return product;
     }
 
     public Iterator<Product> findAll() {
         return productData.iterator();
+    }
+
+    public Product findById(int id) {
+        for (Product p : productData) {
+            if (p.getProductId() == id) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public Product update(Product product) {
+        Product existing = findById(product.getProductId());
+        if (existing != null) {
+            existing.setProductName(product.getProductName());
+            existing.setProductQuantity(product.getProductQuantity());
+        }
+        return existing;
     }
 
 }
