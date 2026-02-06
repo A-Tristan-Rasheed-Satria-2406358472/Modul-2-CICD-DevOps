@@ -14,4 +14,6 @@ public interface ProductService {
 
     public Product update(Product product);
 
+    public boolean deleteById(int id);
+
 }
