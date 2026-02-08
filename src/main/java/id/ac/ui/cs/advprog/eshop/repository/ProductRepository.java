@@ -16,7 +16,7 @@ public class ProductRepository {
     private int nextId = 1;
 
     public Product create(Product product) {
-        product.setProductId(nextId++);
+        product.setProductId(String.valueOf(nextId++));
         productData.add(product);
         return product;
     }
@@ -25,9 +25,9 @@ public class ProductRepository {
         return productData.iterator();
     }
 
-    public Product findById(int id) {
+    public Product findById(String id) {
         for (Product p : productData) {
-            if (p.getProductId() == id) {
+            if (p.getProductId() != null && p.getProductId().equals(id)) {
                 return p;
             }
         }
@@ -43,11 +43,11 @@ public class ProductRepository {
         return existing;
     }
 
-    public boolean deleteById(int id) {
+    public boolean deleteById(String id) {
         Iterator<Product> it = productData.iterator();
         while (it.hasNext()) {
             Product p = it.next();
-            if (p.getProductId() == id) {
+            if (p.getProductId() != null && p.getProductId().equals(id)) {
                 it.remove();
                 return true;
             }
