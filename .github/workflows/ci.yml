@@ -13,7 +13,7 @@ jobs:
       - name: Set up Java Toolchain
         uses: actions/setup-java@v4
         with:
-          distrbution: "temurin"
+          distribution: "temurin"
           java-version: "21"
           cache: "gradle"
       - name: Run unit tests
