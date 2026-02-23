@@ -23,6 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ProductController.class)
 class ProductControllerTest {
 
+  private static final String PRODUCT_LIST_PATH = "/product/list";
+
   @Autowired
   private MockMvc mockMvc;
 
@@ -44,7 +46,7 @@ class ProductControllerTest {
         .param("productName", "Mouse")
         .param("productQuantity", "4"))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/product/list"));
+        .andExpect(redirectedUrl(PRODUCT_LIST_PATH));
 
     ArgumentCaptor<Product> cap = ArgumentCaptor.forClass(Product.class);
     verify(service).create(cap.capture());
@@ -62,7 +64,7 @@ class ProductControllerTest {
     product.setProductQuantity(2);
     when(service.findAll()).thenReturn(List.of(product));
 
-    mockMvc.perform(get("/product/list"))
+    mockMvc.perform(get(PRODUCT_LIST_PATH))
         .andExpect(status().isOk())
         .andExpect(view().name("ProductList"))
         .andExpect(model().attributeExists("products"));
@@ -91,7 +93,7 @@ class ProductControllerTest {
 
     mockMvc.perform(get("/product/edit/9"))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/product/list"));
+        .andExpect(redirectedUrl(PRODUCT_LIST_PATH));
 
     verify(service).findById("9");
   }
@@ -103,7 +105,7 @@ class ProductControllerTest {
         .param("productName", "Edited")
         .param("productQuantity", "7"))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/product/list"));
+        .andExpect(redirectedUrl(PRODUCT_LIST_PATH));
 
     ArgumentCaptor<Product> cap = ArgumentCaptor.forClass(Product.class);
     verify(service).update(cap.capture());
@@ -117,7 +119,7 @@ class ProductControllerTest {
   void deleteProduct_callsServiceAndRedirects() throws Exception {
     mockMvc.perform(get("/product/delete/5"))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/product/list"));
+        .andExpect(redirectedUrl(PRODUCT_LIST_PATH));
 
     verify(service).deleteById("5");
   }
