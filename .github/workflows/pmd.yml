@@ -1,0 +1,24 @@
+name: PMD
+
+on:
+  push: {}
+
+jobs:
+  pmd:
+    name: Run PMD analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run PMD
+        uses: pmd/pmd-github-action@v2.0.0
+        with:
+          pmd-version: "7.0.0-rc4"
+
+      - name: Upload PMD report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pmd-report
+          path: pmd-report.xml
