@@ -10,11 +10,54 @@ jobs:
     steps:
       - name: Check out the git repository
         uses: actions/checkout@v4
+
       - name: Set up Java Toolchain
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "21"
           cache: "gradle"
-      - name: Run unit tests
-        run: ./gradlew test
+
+      - name: Run tests and generate JaCoCo report
+        run: ./gradlew test jacocoTestReport
+
+      - name: Add coverage to GitHub Actions job summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          report = Path("build/reports/jacoco/test/jacocoTestReport.xml")
+          if not report.exists():
+              raise SystemExit(f"JaCoCo report not found: {report}")
+
+          root = ET.parse(report).getroot()
+          counters = {c.attrib["type"]: c.attrib for c in root.findall("counter")}
+
+          def pct(counter_type: str) -> str:
+              data = counters[counter_type]
+              missed = int(data["missed"])
+              covered = int(data["covered"])
+              total = missed + covered
+              value = 100.0 if total == 0 else (covered * 100.0 / total)
+              return f"{value:.2f}% ({covered}/{total})"
+
+          summary_path = Path("$GITHUB_STEP_SUMMARY")
+          with summary_path.open("a", encoding="utf-8") as summary:
+              summary.write("## JaCoCo Coverage Summary\n\n")
+              summary.write("| Metric | Coverage |\n")
+              summary.write("|---|---|\n")
+              summary.write(f"| Instruction | {pct('INSTRUCTION')} |\n")
+              summary.write(f"| Branch | {pct('BRANCH')} |\n")
+              summary.write(f"| Line | {pct('LINE')} |\n")
+              summary.write(f"| Method | {pct('METHOD')} |\n")
+              summary.write(f"| Class | {pct('CLASS')} |\n")
+          PY
+
+      - name: Upload JaCoCo HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test/html
