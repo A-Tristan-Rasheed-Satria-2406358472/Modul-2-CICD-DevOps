@@ -1,16 +1,12 @@
 package id.ac.ui.cs.advprog.eshop.repository;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,16 +25,6 @@ class ProductRepositoryTest {
     product.setProductName(name);
     product.setProductQuantity(quantity);
     return product;
-  }
-
-  private void injectProductData(List<Product> products) {
-    try {
-      Field field = ProductRepository.class.getDeclaredField("productData");
-      field.setAccessible(true);
-      field.set(productRepository, products);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      fail("Failed to set productData for test setup");
-    }
   }
 
   @Test
@@ -107,13 +93,8 @@ class ProductRepositoryTest {
 
   @Test
   void testFindByIdSkipsProductWithNullId() {
-    Product nullIdProduct = new Product();
-    nullIdProduct.setProductName("Broken Product");
-    nullIdProduct.setProductQuantity(1);
-
-    List<Product> data = new ArrayList<>();
-    data.add(nullIdProduct);
-    injectProductData(data);
+    Product nullIdProduct = productRepository.create(newProduct("Broken Product", 1));
+    nullIdProduct.setProductId(null);
 
     Product found = productRepository.findById("1");
 
@@ -169,13 +150,8 @@ class ProductRepositoryTest {
 
   @Test
   void testDeleteByIdSkipsProductWithNullId() {
-    Product nullIdProduct = new Product();
-    nullIdProduct.setProductName("No Id Product");
-    nullIdProduct.setProductQuantity(1);
-
-    List<Product> data = new ArrayList<>();
-    data.add(nullIdProduct);
-    injectProductData(data);
+    Product nullIdProduct = productRepository.create(newProduct("No Id Product", 1));
+    nullIdProduct.setProductId(null);
 
     boolean deleted = productRepository.deleteById("1");
 
