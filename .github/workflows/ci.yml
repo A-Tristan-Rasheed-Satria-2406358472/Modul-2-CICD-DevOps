@@ -10,11 +10,31 @@ jobs:
     steps:
       - name: Check out the git repository
         uses: actions/checkout@v4
+
       - name: Set up Java Toolchain
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "21"
           cache: "gradle"
-      - name: Run unit tests
-        run: ./gradlew test
+
+      - name: Run tests and generate JaCoCo report
+        run: ./gradlew test jacocoTestReport
+
+      - name: Generate coverage summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: build/reports/jacoco/test/jacocoTestReport.xml
+          badge: true
+          format: markdown
+          output: both
+
+      - name: Add coverage to GitHub Actions job summary
+        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload JaCoCo HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test/html
