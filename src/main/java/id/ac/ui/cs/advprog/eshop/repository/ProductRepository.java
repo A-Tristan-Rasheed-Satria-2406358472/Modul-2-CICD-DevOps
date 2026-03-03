@@ -10,49 +10,49 @@ import id.ac.ui.cs.advprog.eshop.model.Product;
 
 @Repository
 
-public class ProductRepository {
+public class ProductRepository implements ProductDataStore {
 
-    private List<Product> productData = new ArrayList<>();
-    private int nextId = 1;
+  private List<Product> productData = new ArrayList<>();
+  private int nextId = 1;
 
-    public Product create(Product product) {
-        product.setProductId(String.valueOf(nextId++));
-        productData.add(product);
-        return product;
+  public Product create(Product product) {
+    product.setProductId(String.valueOf(nextId++));
+    productData.add(product);
+    return product;
+  }
+
+  public Iterator<Product> findAll() {
+    return productData.iterator();
+  }
+
+  public Product findById(String id) {
+    for (Product p : productData) {
+      if (p.getProductId() != null && p.getProductId().equals(id)) {
+        return p;
+      }
     }
+    return null;
+  }
 
-    public Iterator<Product> findAll() {
-        return productData.iterator();
+  public Product update(Product product) {
+    Product existing = findById(product.getProductId());
+    if (existing != null) {
+      existing.setProductName(product.getProductName());
+      existing.setProductQuantity(product.getProductQuantity());
     }
+    return existing;
+  }
 
-    public Product findById(String id) {
-        for (Product p : productData) {
-            if (p.getProductId() != null && p.getProductId().equals(id)) {
-                return p;
-            }
-        }
-        return null;
+  public boolean deleteById(String id) {
+    Iterator<Product> it = productData.iterator();
+    while (it.hasNext()) {
+      Product p = it.next();
+      if (p.getProductId() != null && p.getProductId().equals(id)) {
+        it.remove();
+        return true;
+      }
     }
-
-    public Product update(Product product) {
-        Product existing = findById(product.getProductId());
-        if (existing != null) {
-            existing.setProductName(product.getProductName());
-            existing.setProductQuantity(product.getProductQuantity());
-        }
-        return existing;
-    }
-
-    public boolean deleteById(String id) {
-        Iterator<Product> it = productData.iterator();
-        while (it.hasNext()) {
-            Product p = it.next();
-            if (p.getProductId() != null && p.getProductId().equals(id)) {
-                it.remove();
-                return true;
-            }
-        }
-        return false;
-    }
+    return false;
+  }
 
 }
