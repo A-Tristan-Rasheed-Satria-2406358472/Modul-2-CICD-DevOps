@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import id.ac.ui.cs.advprog.eshop.model.Car;
 
 @Repository
-public class CarRepository {
+public class CarRepository implements CarDataStore {
   static int id = 0;
   private List<Car> carData = new ArrayList<>();
 

@@ -4,45 +4,47 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import id.ac.ui.cs.advprog.eshop.model.Product;
-import id.ac.ui.cs.advprog.eshop.repository.ProductRepository;
+import id.ac.ui.cs.advprog.eshop.repository.ProductDataStore;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
+  private final ProductDataStore productRepository;
 
-    @Override
-    public Product create(Product product) {
-        productRepository.create(product);
-        return product;
-    }
+  public ProductServiceImpl(ProductDataStore productRepository) {
+    this.productRepository = productRepository;
+  }
 
-    @Override
-    public List<Product> findAll() {
-        Iterator< Product> productIterator = productRepository.findAll();
-        List< Product> allProduct = new ArrayList<>();
-        productIterator.forEachRemaining(allProduct::add);
-        return allProduct;
-    }
+  @Override
+  public Product create(Product product) {
+    productRepository.create(product);
+    return product;
+  }
 
-    @Override
-    public Product findById(String id) {
-        return productRepository.findById(id);
-    }
+  @Override
+  public List<Product> findAll() {
+    Iterator<Product> productIterator = productRepository.findAll();
+    List<Product> allProduct = new ArrayList<>();
+    productIterator.forEachRemaining(allProduct::add);
+    return allProduct;
+  }
 
-    @Override
-    public Product update(Product product) {
-        return productRepository.update(product);
-    }
+  @Override
+  public Product findById(String id) {
+    return productRepository.findById(id);
+  }
 
-    @Override
-    public boolean deleteById(String id) {
-        return productRepository.deleteById(id);
-    }
+  @Override
+  public Product update(Product product) {
+    return productRepository.update(product);
+  }
+
+  @Override
+  public boolean deleteById(String id) {
+    return productRepository.deleteById(id);
+  }
 
 }
