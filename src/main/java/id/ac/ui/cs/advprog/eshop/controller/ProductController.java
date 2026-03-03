@@ -51,7 +51,6 @@ public class ProductController {
 
   @PostMapping("/edit")
   public String editProductPost(@ModelAttribute Product product, Model model) {
-    System.out.println(product.getProductId());
     service.update(product);
     return "redirect:/product/list";
   }
@@ -103,7 +102,6 @@ class CarController extends ProductController {
 
   @PostMapping("/editCar")
   public String editCarPost(@ModelAttribute Car car, Model model) {
-    System.out.println(car.getCarId());
     carservice.update(car.getCarId(), car);
     return "redirect:listCar";
   }
