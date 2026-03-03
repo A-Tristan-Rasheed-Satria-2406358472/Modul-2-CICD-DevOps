@@ -5,25 +5,17 @@
 ### 1) Explain what principles you apply to your project!
 
 - **SRP (Single Responsibility Principle)** Setiap class punya satu tanggung jawab utama. ProductController hanya mengurus endpoint Product, CarController hanya endpoint Car, service fokus ke business logic, repository fokus ke akses data sementara Model hanya menyimpan data/invarian sederhana
-
 - **OCP (Open/Closed Principle)** Service dibangun agar bisa diperluas tanpa mengubah kode inti. Ada ProductServiceImpl dimana dia bergantung ke ProductDataStore, jadi kalau mau ganti penyimpanan data (misal dari in-memory ke database), cukup tambah implementasi datastore baru.
-
 - **LSP (Liskov Substitution Principle)** Tidak ada lagi pewarisan yang memaksa relasi yang tidak tepat. Car flow dipisah ke CarController, sehingga tidak ada subclass yang melanggar perilaku base class.
-
-- **ISP (Interface Segregation Principle)** Interface dipisah sesuai kebutuhan domain, Di roductDataStore dan CarDataStore, supaya client-nya tidak bergantung pada method yang tidak dipakai
-
+- **ISP (Interface Segregation Principle)** Interface dipisah sesuai kebutuhan domain, Di ProductDataStore dan CarDataStore, supaya client-nya tidak bergantung pada method yang tidak dipakai
 - **DIP (Dependency Inversion Principle)** High-level module bergantung ke abstraksi, bukan bergantung ke implementasi. Di ProductServiceImpl dan CarServiceImpl menerima dependency berupa interface melalui constructor injection
 
 ### 2) Explain the advantages of applying SOLID principles to your project with examples.
 
 - Lebih mudah maintenance-nya. Karena Product dan Car dipisah, perubahan fitur Car tidak merusak flow Product.
-
 - Lebih mudah dikembangin lagi (extensible). Dengan OCP + DIP, bisa aja kalau mau menambah implementasi repository baru tanpa perlu ubah logic service yang sudah ada
-
 - Lebih gampang di-test. Karena service bergantung pada interface, dependency bisa di-mock saat unit testing. Membuat test lebih cepat dan terisolasi
-
 - Coupling antar layer menurun. Controller,Service, dan Repository terhubung lewat kontrak yang jelas, jadi refactor di satu layer tidak menimbulkan banyak perubahan berantai.
-
 - Kode lebih scalable untuk fitur berikutnya, Saat nambah entity/fitur baru, pola yang sama bisa dipakai ulang tanpa membuat class lama terlalu gemuk
 
 ## 3) Explain the disadvantages of not applying SOLID principles to your project with examples.
