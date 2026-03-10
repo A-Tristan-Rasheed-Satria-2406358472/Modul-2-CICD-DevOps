@@ -14,11 +14,15 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
 
     private static final String PAYMENT_METHOD_VOUCHER_CODE = "Voucher Code";
+    private static final String PAYMENT_DATA_VOUCHER_CODE = "voucherCode";
     private static final String PAYMENT_STATUS_PENDING = "PENDING";
     private static final String PAYMENT_STATUS_SUCCESS = "SUCCESS";
     private static final String PAYMENT_STATUS_REJECTED = "REJECTED";
     private static final String ORDER_STATUS_SUCCESS = "SUCCESS";
     private static final String ORDER_STATUS_FAILED = "FAILED";
+    private static final String VOUCHER_CODE_PREFIX = "ESHOP";
+    private static final int VOUCHER_CODE_LENGTH = 16;
+    private static final int VOUCHER_NUMERIC_CHARACTER_COUNT = 8;
 
     @Autowired
     private PaymentRepository paymentRepository;
@@ -27,7 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
         String status = PAYMENT_STATUS_PENDING;
         if (PAYMENT_METHOD_VOUCHER_CODE.equals(method)) {
-            String voucherCode = paymentData.get("voucherCode");
+            String voucherCode = paymentData.get(PAYMENT_DATA_VOUCHER_CODE);
             status = isValidVoucherCode(voucherCode)
                     ? PAYMENT_STATUS_SUCCESS
                     : PAYMENT_STATUS_REJECTED;
@@ -73,20 +77,24 @@ public class PaymentServiceImpl implements PaymentService {
             return false;
         }
 
-        if (voucherCode.length() != 16) {
+        if (voucherCode.length() != VOUCHER_CODE_LENGTH) {
             return false;
         }
 
-        if (!voucherCode.startsWith("ESHOP")) {
+        if (!voucherCode.startsWith(VOUCHER_CODE_PREFIX)) {
             return false;
         }
 
+        return countNumericCharacters(voucherCode) == VOUCHER_NUMERIC_CHARACTER_COUNT;
+    }
+
+    private int countNumericCharacters(String value) {
         int numericCharacters = 0;
-        for (char character : voucherCode.toCharArray()) {
+        for (char character : value.toCharArray()) {
             if (Character.isDigit(character)) {
                 numericCharacters += 1;
             }
         }
-        return numericCharacters == 8;
+        return numericCharacters;
     }
 }
