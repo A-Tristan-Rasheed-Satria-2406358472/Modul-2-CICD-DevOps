@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PaymentRepositoryTest {
 
+    private static final String PAYMENT_ID = "payment-1";
+
     private PaymentRepository paymentRepository;
     private Payment payment;
 
@@ -26,7 +28,7 @@ class PaymentRepositoryTest {
         paymentData.put("voucherCode", "ESHOP1234ABC5678");
 
         payment = new Payment(
-                "payment-1",
+                PAYMENT_ID,
                 "Voucher Code",
                 "SUCCESS",
                 paymentData
@@ -59,7 +61,7 @@ class PaymentRepositoryTest {
         Map<String, String> updatedPaymentData = new HashMap<>();
         updatedPaymentData.put("voucherCode", "ESHOP9999ABC5678");
         Payment updatedPayment = new Payment(
-                "payment-1",
+                PAYMENT_ID,
                 "Voucher Code",
                 "REJECTED",
                 updatedPaymentData
@@ -68,7 +70,7 @@ class PaymentRepositoryTest {
         Payment result = paymentRepository.save(updatedPayment);
         List<Payment> payments = paymentRepository.findAllPayments();
 
-        assertEquals("payment-1", result.getId());
+        assertEquals(PAYMENT_ID, result.getId());
         assertEquals(1, payments.size());
         assertEquals("REJECTED", payments.get(0).getStatus());
         assertEquals("ESHOP9999ABC5678", payments.get(0).getPaymentData().get("voucherCode"));
@@ -93,7 +95,7 @@ class PaymentRepositoryTest {
         List<Payment> payments = paymentRepository.findAllPayments();
 
         assertEquals(2, payments.size());
-        assertEquals("payment-1", payments.get(0).getId());
+        assertEquals(PAYMENT_ID, payments.get(0).getId());
         assertEquals("payment-2", payments.get(1).getId());
     }
 

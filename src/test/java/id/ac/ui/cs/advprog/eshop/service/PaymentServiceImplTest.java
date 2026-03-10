@@ -29,6 +29,14 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceImplTest {
 
+    private static final String PAYMENT_ID = "payment-1";
+    private static final String VOUCHER_METHOD = "Voucher Code";
+    private static final String BANK_TRANSFER_METHOD = "Bank Transfer";
+    private static final String PENDING_STATUS = "PENDING";
+    private static final String SUCCESS_STATUS = "SUCCESS";
+    private static final String REJECTED_STATUS = "REJECTED";
+    private static final String FAILED_STATUS = "FAILED";
+
     @InjectMocks
     private PaymentServiceImpl paymentService;
 
@@ -60,13 +68,13 @@ class PaymentServiceImplTest {
 
     @Test
     void testAddPayment() {
-        doReturn(new Payment("payment-1", this.order, "Voucher Code", "PENDING", this.paymentData))
+        doReturn(new Payment(PAYMENT_ID, this.order, VOUCHER_METHOD, PENDING_STATUS, this.paymentData))
                 .when(paymentRepository).save(any(Payment.class));
 
-        Payment result = paymentService.addPayment(this.order, "Voucher Code", this.paymentData);
+        Payment result = paymentService.addPayment(this.order, VOUCHER_METHOD, this.paymentData);
 
         assertNotNull(result);
-        assertEquals("Voucher Code", result.getMethod());
+        assertEquals(VOUCHER_METHOD, result.getMethod());
         assertEquals(this.paymentData, result.getPaymentData());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
@@ -76,10 +84,10 @@ class PaymentServiceImplTest {
         doAnswer(invocation -> invocation.getArgument(0))
                 .when(paymentRepository).save(any(Payment.class));
 
-        Payment result = paymentService.addPayment(this.order, "Voucher Code", this.paymentData);
+        Payment result = paymentService.addPayment(this.order, VOUCHER_METHOD, this.paymentData);
 
         assertNotNull(result);
-        assertEquals("SUCCESS", result.getStatus());
+        assertEquals(SUCCESS_STATUS, result.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
@@ -91,10 +99,10 @@ class PaymentServiceImplTest {
         doAnswer(invocation -> invocation.getArgument(0))
                 .when(paymentRepository).save(any(Payment.class));
 
-        Payment result = paymentService.addPayment(this.order, "Voucher Code", invalidPaymentData);
+        Payment result = paymentService.addPayment(this.order, VOUCHER_METHOD, invalidPaymentData);
 
         assertNotNull(result);
-        assertEquals("REJECTED", result.getStatus());
+        assertEquals(REJECTED_STATUS, result.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
@@ -107,10 +115,10 @@ class PaymentServiceImplTest {
         doAnswer(invocation -> invocation.getArgument(0))
                 .when(paymentRepository).save(any(Payment.class));
 
-        Payment result = paymentService.addPayment(this.order, "Bank Transfer", bankTransferData);
+        Payment result = paymentService.addPayment(this.order, BANK_TRANSFER_METHOD, bankTransferData);
 
         assertNotNull(result);
-        assertEquals("PENDING", result.getStatus());
+        assertEquals(PENDING_STATUS, result.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
@@ -123,10 +131,10 @@ class PaymentServiceImplTest {
         doAnswer(invocation -> invocation.getArgument(0))
                 .when(paymentRepository).save(any(Payment.class));
 
-        Payment result = paymentService.addPayment(this.order, "Bank Transfer", invalidBankTransferData);
+        Payment result = paymentService.addPayment(this.order, BANK_TRANSFER_METHOD, invalidBankTransferData);
 
         assertNotNull(result);
-        assertEquals("REJECTED", result.getStatus());
+        assertEquals(REJECTED_STATUS, result.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
@@ -139,46 +147,46 @@ class PaymentServiceImplTest {
         doAnswer(invocation -> invocation.getArgument(0))
                 .when(paymentRepository).save(any(Payment.class));
 
-        Payment result = paymentService.addPayment(this.order, "Bank Transfer", invalidBankTransferData);
+        Payment result = paymentService.addPayment(this.order, BANK_TRANSFER_METHOD, invalidBankTransferData);
 
         assertNotNull(result);
-        assertEquals("REJECTED", result.getStatus());
+        assertEquals(REJECTED_STATUS, result.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
     @Test
     void testSetStatusSuccessUpdatesOrderStatus() {
-        Payment payment = new Payment("payment-1", this.order, "Voucher Code", "PENDING", this.paymentData);
+        Payment payment = new Payment(PAYMENT_ID, this.order, VOUCHER_METHOD, PENDING_STATUS, this.paymentData);
         doReturn(payment).when(paymentRepository).save(any(Payment.class));
 
-        Payment result = paymentService.setStatus(payment, "SUCCESS");
+        Payment result = paymentService.setStatus(payment, SUCCESS_STATUS);
 
-        assertEquals("SUCCESS", result.getStatus());
-        assertEquals("SUCCESS", this.order.getStatus());
+        assertEquals(SUCCESS_STATUS, result.getStatus());
+        assertEquals(SUCCESS_STATUS, this.order.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
     @Test
     void testSetStatusRejectedUpdatesOrderStatus() {
-        Payment payment = new Payment("payment-1", this.order, "Voucher Code", "PENDING", this.paymentData);
+        Payment payment = new Payment(PAYMENT_ID, this.order, VOUCHER_METHOD, PENDING_STATUS, this.paymentData);
         doReturn(payment).when(paymentRepository).save(any(Payment.class));
 
-        Payment result = paymentService.setStatus(payment, "REJECTED");
+        Payment result = paymentService.setStatus(payment, REJECTED_STATUS);
 
-        assertEquals("REJECTED", result.getStatus());
-        assertEquals("FAILED", this.order.getStatus());
+        assertEquals(REJECTED_STATUS, result.getStatus());
+        assertEquals(FAILED_STATUS, this.order.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
     @Test
     void testGetPaymentIfIdFound() {
-        Payment payment = new Payment("payment-1", this.order, "Voucher Code", "PENDING", this.paymentData);
-        doReturn(payment).when(paymentRepository).findById("payment-1");
+        Payment payment = new Payment(PAYMENT_ID, this.order, VOUCHER_METHOD, PENDING_STATUS, this.paymentData);
+        doReturn(payment).when(paymentRepository).findById(PAYMENT_ID);
 
-        Payment result = paymentService.getPayment("payment-1");
+        Payment result = paymentService.getPayment(PAYMENT_ID);
 
         assertNotNull(result);
-        assertEquals("payment-1", result.getId());
+        assertEquals(PAYMENT_ID, result.getId());
     }
 
     @Test
@@ -193,14 +201,14 @@ class PaymentServiceImplTest {
     @Test
     void testGetAllPayments() {
         List<Payment> payments = new ArrayList<>();
-        payments.add(new Payment("payment-1", this.order, "Voucher Code", "PENDING", this.paymentData));
-        payments.add(new Payment("payment-2", this.order, "Bank Transfer", "SUCCESS", this.paymentData));
+        payments.add(new Payment(PAYMENT_ID, this.order, VOUCHER_METHOD, PENDING_STATUS, this.paymentData));
+        payments.add(new Payment("payment-2", this.order, BANK_TRANSFER_METHOD, SUCCESS_STATUS, this.paymentData));
         doReturn(payments).when(paymentRepository).findAllPayments();
 
         List<Payment> results = paymentService.getAllPayments();
 
         assertEquals(2, results.size());
-        assertTrue(results.stream().anyMatch(payment -> payment.getId().equals("payment-1")));
+        assertTrue(results.stream().anyMatch(payment -> payment.getId().equals(PAYMENT_ID)));
         assertTrue(results.stream().anyMatch(payment -> payment.getId().equals("payment-2")));
     }
 }

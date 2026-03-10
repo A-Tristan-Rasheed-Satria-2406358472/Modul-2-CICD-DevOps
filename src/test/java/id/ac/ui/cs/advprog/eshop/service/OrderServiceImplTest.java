@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +27,8 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
+
+    private static final String UNKNOWN_ORDER_ID = "zcze";
 
     @InjectMocks
     OrderServiceImpl orderService;
@@ -115,10 +118,10 @@ class OrderServiceImplTest {
 
     @Test
     void testUpdateStatusInvalidOrderId() {
-        doReturn(null).when(orderRepository).findById("zcze");
+        doReturn(null).when(orderRepository).findById(UNKNOWN_ORDER_ID);
 
         assertThrows(NoSuchElementException.class,
-                () -> orderService.updateStatus("zcze", OrderStatus.SUCCESS.getValue()));
+                () -> orderService.updateStatus(UNKNOWN_ORDER_ID, OrderStatus.SUCCESS.getValue()));
 
         verify(orderRepository, times(0)).save(any(Order.class));
     }
@@ -134,8 +137,8 @@ class OrderServiceImplTest {
 
     @Test
     void testFindByIdIfIdNotFound() {
-        doReturn(null).when(orderRepository).findById("zcze");
-        assertNull(orderService.findById("zcze"));
+        doReturn(null).when(orderRepository).findById(UNKNOWN_ORDER_ID);
+        assertNull(orderService.findById(UNKNOWN_ORDER_ID));
     }
 
     @Test
@@ -153,12 +156,11 @@ class OrderServiceImplTest {
     @Test
     void testFindAllByAuthorIfAllLowercase() {
         Order order = orders.get(1);
+        String lowercaseAuthor = order.getAuthor().toLowerCase(Locale.ROOT);
         doReturn(new ArrayList<Order>()).when(orderRepository)
-                .findAllByAuthor(order.getAuthor().toLowerCase());
+                .findAllByAuthor(lowercaseAuthor);
 
-        List<Order> results = orderService.findAllByAuthor(
-                order.getAuthor().toLowerCase()
-        );
+        List<Order> results = orderService.findAllByAuthor(lowercaseAuthor);
         assertTrue(results.isEmpty());
     }
 }
