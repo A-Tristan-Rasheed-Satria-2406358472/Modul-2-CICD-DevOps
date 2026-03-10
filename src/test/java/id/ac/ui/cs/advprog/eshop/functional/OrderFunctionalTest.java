@@ -3,13 +3,12 @@ package id.ac.ui.cs.advprog.eshop.functional;
 import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.repository.OrderRepository;
-import io.github.bonigarcia.seljup.SeleniumJupiter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,8 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ExtendWith(SeleniumJupiter.class)
-class OrderFunctionalTest {
+class OrderFunctionalTest extends FunctionalTestBase {
 
     private static final String ORDER_ID = "order-functional-pay-1";
 
@@ -59,50 +57,76 @@ class OrderFunctionalTest {
     }
 
     @Test
-    void createOrderPage_isAccessible(ChromeDriver driver) {
-        driver.get(baseUrl + "/order/create");
+    void createOrderPage_isAccessible() {
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/order/create");
 
-        assertEquals("Create Order", driver.getTitle());
-        assertEquals("Create Order", driver.findElement(By.tagName("h1")).getText());
+            assertEquals("Create Order", driver.getTitle());
+            assertEquals("Create Order", driver.findElement(By.tagName("h1")).getText());
+        } finally {
+            driver.quit();
+        }
     }
 
     @Test
-    void orderHistoryPage_isAccessible(ChromeDriver driver) {
-        driver.get(baseUrl + "/order/history");
+    void orderHistoryPage_isAccessible() {
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/order/history");
 
-        assertEquals("Order History", driver.getTitle());
-        assertEquals("Order History", driver.findElement(By.tagName("h1")).getText());
+            assertEquals("Order History", driver.getTitle());
+            assertEquals("Order History", driver.findElement(By.tagName("h1")).getText());
+        } finally {
+            driver.quit();
+        }
     }
 
     @Test
-    void user_canSubmitOrderHistoryForm(ChromeDriver driver) {
-        driver.get(baseUrl + "/order/history");
+    void user_canSubmitOrderHistoryForm() {
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/order/history");
 
-        driver.findElement(By.id("author")).sendKeys("Safira Sudrajat");
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+            driver.findElement(By.id("author")).sendKeys("Safira Sudrajat");
+            driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        assertEquals("Order History List", driver.getTitle());
-        assertEquals("Order History Result", driver.findElement(By.tagName("h1")).getText());
+            assertEquals("Order History List", driver.getTitle());
+            assertEquals("Order History Result", driver.findElement(By.tagName("h1")).getText());
+        } finally {
+            driver.quit();
+        }
     }
 
     @Test
-    void payOrderPage_isAccessibleForExistingOrder(ChromeDriver driver) {
-        driver.get(baseUrl + "/order/pay/" + ORDER_ID);
+    void payOrderPage_isAccessibleForExistingOrder() {
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/order/pay/" + ORDER_ID);
 
-        assertEquals("Order Payment", driver.getTitle());
-        assertEquals("Order Payment", driver.findElement(By.tagName("h1")).getText());
+            assertEquals("Order Payment", driver.getTitle());
+            assertEquals("Order Payment", driver.findElement(By.tagName("h1")).getText());
+        } finally {
+            driver.quit();
+        }
     }
 
     @Test
-    void user_canSubmitPaymentForOrder(ChromeDriver driver) {
-        driver.get(baseUrl + "/order/pay/" + ORDER_ID);
+    void user_canSubmitPaymentForOrder() {
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/order/pay/" + ORDER_ID);
 
-        driver.findElement(By.id("method")).sendKeys("Voucher Code");
-        driver.findElement(By.id("voucherCode")).sendKeys("ESHOP1234ABC5678");
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+            Select paymentMethod = new Select(driver.findElement(By.id("method")));
+            paymentMethod.selectByValue("Voucher Code");
+            driver.findElement(By.id("voucherCode")).sendKeys("ESHOP1234ABC5678");
+            driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        assertEquals("Order Payment Result", driver.getTitle());
-        assertEquals("Order Payment Result", driver.findElement(By.tagName("h1")).getText());
-        Assertions.assertFalse(driver.findElement(By.id("payment-id")).getText().isBlank());
+            assertEquals("Order Payment Result", driver.getTitle());
+            assertEquals("Order Payment Result", driver.findElement(By.tagName("h1")).getText());
+            Assertions.assertFalse(driver.findElement(By.id("payment-id")).getText().isBlank());
+        } finally {
+            driver.quit();
+        }
     }
 }

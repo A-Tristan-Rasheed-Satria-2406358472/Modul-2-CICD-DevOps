@@ -17,7 +17,7 @@
     <span th:text="${order.author}">author</span>
   </p>
 
-  <form th:action="@{/order/pay/{orderId}(orderId=${order.id})}" method="post">
+  <form th:action="@{/order/pay/{orderId}/process(orderId=${order.id})}" method="post">
     <div>
       <label for="method">Payment Method</label>
       <select id="method" name="method">

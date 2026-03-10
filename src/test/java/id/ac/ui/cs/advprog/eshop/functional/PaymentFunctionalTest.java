@@ -5,10 +5,8 @@ import id.ac.ui.cs.advprog.eshop.model.Payment;
 import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.repository.OrderRepository;
 import id.ac.ui.cs.advprog.eshop.repository.PaymentRepository;
-import io.github.bonigarcia.seljup.SeleniumJupiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
@@ -27,8 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ExtendWith(SeleniumJupiter.class)
-class PaymentFunctionalTest {
+class PaymentFunctionalTest extends FunctionalTestBase {
 
     @LocalServerPort
     private int serverPort;
@@ -79,46 +76,71 @@ class PaymentFunctionalTest {
     }
 
     @Test
-    void paymentDetailForm_isAccessible(ChromeDriver driver) {
-        driver.get(baseUrl + "/payment/detail");
+    void paymentDetailForm_isAccessible() {
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/payment/detail");
 
-        assertEquals("Payment Detail", driver.getTitle());
-        assertEquals("Payment Detail", driver.findElement(By.tagName("h1")).getText());
+            assertEquals("Payment Detail", driver.getTitle());
+            assertEquals("Payment Detail", driver.findElement(By.tagName("h1")).getText());
+        } finally {
+            driver.quit();
+        }
     }
 
     @Test
-    void paymentDetailPage_showsPaymentById(ChromeDriver driver) {
-        driver.get(baseUrl + "/payment/detail/" + paymentId);
+    void paymentDetailPage_showsPaymentById() {
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/payment/detail/" + paymentId);
 
-        assertEquals("Payment Detail", driver.getTitle());
-        assertEquals(paymentId, driver.findElement(By.id("payment-id")).getText());
+            assertEquals("Payment Detail", driver.getTitle());
+            assertEquals(paymentId, driver.findElement(By.id("payment-id")).getText());
+        } finally {
+            driver.quit();
+        }
     }
 
     @Test
-    void paymentAdminListPage_showsAllPayments(ChromeDriver driver) {
-        driver.get(baseUrl + "/payment/admin/list");
+    void paymentAdminListPage_showsAllPayments() {
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/payment/admin/list");
 
-        assertEquals("Payment List", driver.getTitle());
-        assertTrue(driver.getPageSource().contains(paymentId));
+            assertEquals("Payment List", driver.getTitle());
+            assertTrue(driver.getPageSource().contains(paymentId));
+        } finally {
+            driver.quit();
+        }
     }
 
     @Test
-    void paymentAdminDetailPage_showsPaymentData(ChromeDriver driver) {
-        driver.get(baseUrl + "/payment/admin/detail/" + paymentId);
+    void paymentAdminDetailPage_showsPaymentData() {
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/payment/admin/detail/" + paymentId);
 
-        assertEquals("Payment Admin Detail", driver.getTitle());
-        assertEquals(paymentId, driver.findElement(By.id("payment-id")).getText());
+            assertEquals("Payment Admin Detail", driver.getTitle());
+            assertEquals(paymentId, driver.findElement(By.id("payment-id")).getText());
+        } finally {
+            driver.quit();
+        }
     }
 
     @Test
-    void admin_canSetPaymentStatus(ChromeDriver driver) {
-        driver.get(baseUrl + "/payment/admin/detail/" + paymentId);
+    void admin_canSetPaymentStatus() {
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/payment/admin/detail/" + paymentId);
 
-        Select statusSelect = new Select(driver.findElement(By.id("statusInput")));
-        statusSelect.selectByValue("REJECTED");
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+            Select statusSelect = new Select(driver.findElement(By.id("statusInput")));
+            statusSelect.selectByValue("REJECTED");
+            driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        assertEquals("Payment Admin Detail", driver.getTitle());
-        assertEquals("REJECTED", driver.findElement(By.id("payment-status")).getText());
+            assertEquals("Payment Admin Detail", driver.getTitle());
+            assertEquals("REJECTED", driver.findElement(By.id("payment-status")).getText());
+        } finally {
+            driver.quit();
+        }
     }
 }
