@@ -13,6 +13,7 @@ import java.util.UUID;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
+    private static final String PAYMENT_METHOD_VOUCHER_CODE = "Voucher Code";
     private static final String PAYMENT_STATUS_PENDING = "PENDING";
     private static final String PAYMENT_STATUS_SUCCESS = "SUCCESS";
     private static final String PAYMENT_STATUS_REJECTED = "REJECTED";
@@ -24,11 +25,19 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
+        String status = PAYMENT_STATUS_PENDING;
+        if (PAYMENT_METHOD_VOUCHER_CODE.equals(method)) {
+            String voucherCode = paymentData.get("voucherCode");
+            status = isValidVoucherCode(voucherCode)
+                    ? PAYMENT_STATUS_SUCCESS
+                    : PAYMENT_STATUS_REJECTED;
+        }
+
         Payment payment = new Payment(
                 UUID.randomUUID().toString(),
                 order,
                 method,
-                PAYMENT_STATUS_PENDING,
+                status,
                 paymentData
         );
         return paymentRepository.save(payment);
@@ -57,5 +66,27 @@ public class PaymentServiceImpl implements PaymentService {
         } else if (PAYMENT_STATUS_REJECTED.equals(payment.getStatus())) {
             payment.getOrder().setStatus(ORDER_STATUS_FAILED);
         }
+    }
+
+    private boolean isValidVoucherCode(String voucherCode) {
+        if (voucherCode == null) {
+            return false;
+        }
+
+        if (voucherCode.length() != 16) {
+            return false;
+        }
+
+        if (!voucherCode.startsWith("ESHOP")) {
+            return false;
+        }
+
+        int numericCharacters = 0;
+        for (char character : voucherCode.toCharArray()) {
+            if (Character.isDigit(character)) {
+                numericCharacters += 1;
+            }
+        }
+        return numericCharacters == 8;
     }
 }
