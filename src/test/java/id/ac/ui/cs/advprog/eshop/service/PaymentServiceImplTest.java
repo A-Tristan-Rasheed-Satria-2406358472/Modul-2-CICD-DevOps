@@ -99,6 +99,54 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    void testAddPaymentWithValidBankTransferKeepsPendingStatus() {
+        Map<String, String> bankTransferData = new HashMap<>();
+        bankTransferData.put("bankName", "BCA");
+        bankTransferData.put("referenceCode", "TRF-001");
+
+        doAnswer(invocation -> invocation.getArgument(0))
+                .when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(this.order, "Bank Transfer", bankTransferData);
+
+        assertNotNull(result);
+        assertEquals("PENDING", result.getStatus());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
+    void testAddPaymentWithEmptyBankTransferDataSetsRejectedStatus() {
+        Map<String, String> invalidBankTransferData = new HashMap<>();
+        invalidBankTransferData.put("bankName", "");
+        invalidBankTransferData.put("referenceCode", "TRF-001");
+
+        doAnswer(invocation -> invocation.getArgument(0))
+                .when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(this.order, "Bank Transfer", invalidBankTransferData);
+
+        assertNotNull(result);
+        assertEquals("REJECTED", result.getStatus());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
+    void testAddPaymentWithNullBankTransferDataSetsRejectedStatus() {
+        Map<String, String> invalidBankTransferData = new HashMap<>();
+        invalidBankTransferData.put("bankName", "BCA");
+        invalidBankTransferData.put("referenceCode", null);
+
+        doAnswer(invocation -> invocation.getArgument(0))
+                .when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(this.order, "Bank Transfer", invalidBankTransferData);
+
+        assertNotNull(result);
+        assertEquals("REJECTED", result.getStatus());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
     void testSetStatusSuccessUpdatesOrderStatus() {
         Payment payment = new Payment("payment-1", this.order, "Voucher Code", "PENDING", this.paymentData);
         doReturn(payment).when(paymentRepository).save(any(Payment.class));
