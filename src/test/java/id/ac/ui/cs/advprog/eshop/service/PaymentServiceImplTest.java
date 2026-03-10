@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.eshop.service;
 
+import id.ac.ui.cs.advprog.eshop.enums.OrderStatus;
 import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Payment;
 import id.ac.ui.cs.advprog.eshop.model.Product;
@@ -32,10 +33,12 @@ class PaymentServiceImplTest {
     private static final String PAYMENT_ID = "payment-1";
     private static final String VOUCHER_METHOD = "Voucher Code";
     private static final String BANK_TRANSFER_METHOD = "Bank Transfer";
+    private static final String CASH_ON_DELIVERY_METHOD = "Cash on Delivery";
     private static final String PENDING_STATUS = "PENDING";
     private static final String SUCCESS_STATUS = "SUCCESS";
     private static final String REJECTED_STATUS = "REJECTED";
     private static final String FAILED_STATUS = "FAILED";
+    private static final String VOUCHER_CODE_KEY = "voucherCode";
 
     @InjectMocks
     private PaymentServiceImpl paymentService;
@@ -63,7 +66,7 @@ class PaymentServiceImplTest {
         );
 
         this.paymentData = new HashMap<>();
-        this.paymentData.put("voucherCode", "ESHOP1234ABC5678");
+        this.paymentData.put(VOUCHER_CODE_KEY, "ESHOP1234ABC5678");
     }
 
     @Test
@@ -94,7 +97,52 @@ class PaymentServiceImplTest {
     @Test
     void testAddPaymentWithInvalidVoucherCodeSetsRejectedStatus() {
         Map<String, String> invalidPaymentData = new HashMap<>();
-        invalidPaymentData.put("voucherCode", "INVALID");
+        invalidPaymentData.put(VOUCHER_CODE_KEY, "INVALID");
+
+        doAnswer(invocation -> invocation.getArgument(0))
+                .when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(this.order, VOUCHER_METHOD, invalidPaymentData);
+
+        assertNotNull(result);
+        assertEquals(REJECTED_STATUS, result.getStatus());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
+    void testAddPaymentWithNullVoucherCodeSetsRejectedStatus() {
+        Map<String, String> invalidPaymentData = new HashMap<>();
+        invalidPaymentData.put(VOUCHER_CODE_KEY, null);
+
+        doAnswer(invocation -> invocation.getArgument(0))
+                .when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(this.order, VOUCHER_METHOD, invalidPaymentData);
+
+        assertNotNull(result);
+        assertEquals(REJECTED_STATUS, result.getStatus());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
+    void testAddPaymentWithWrongVoucherPrefixSetsRejectedStatus() {
+        Map<String, String> invalidPaymentData = new HashMap<>();
+        invalidPaymentData.put(VOUCHER_CODE_KEY, "TOKOO1234ABC5678");
+
+        doAnswer(invocation -> invocation.getArgument(0))
+                .when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(this.order, VOUCHER_METHOD, invalidPaymentData);
+
+        assertNotNull(result);
+        assertEquals(REJECTED_STATUS, result.getStatus());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
+    void testAddPaymentWithWrongVoucherNumericCountSetsRejectedStatus() {
+        Map<String, String> invalidPaymentData = new HashMap<>();
+        invalidPaymentData.put(VOUCHER_CODE_KEY, "ESHOPABCDABCDEFG");
 
         doAnswer(invocation -> invocation.getArgument(0))
                 .when(paymentRepository).save(any(Payment.class));
@@ -155,6 +203,21 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    void testAddPaymentWithUnknownMethodKeepsPendingStatus() {
+        Map<String, String> cashData = new HashMap<>();
+        cashData.put("address", "Depok");
+
+        doAnswer(invocation -> invocation.getArgument(0))
+                .when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(this.order, CASH_ON_DELIVERY_METHOD, cashData);
+
+        assertNotNull(result);
+        assertEquals(PENDING_STATUS, result.getStatus());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
     void testSetStatusSuccessUpdatesOrderStatus() {
         Payment payment = new Payment(PAYMENT_ID, this.order, VOUCHER_METHOD, PENDING_STATUS, this.paymentData);
         doReturn(payment).when(paymentRepository).save(any(Payment.class));
@@ -175,6 +238,18 @@ class PaymentServiceImplTest {
 
         assertEquals(REJECTED_STATUS, result.getStatus());
         assertEquals(FAILED_STATUS, this.order.getStatus());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
+    void testSetStatusPendingDoesNotChangeOrderStatus() {
+        Payment payment = new Payment(PAYMENT_ID, this.order, VOUCHER_METHOD, SUCCESS_STATUS, this.paymentData);
+        doReturn(payment).when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.setStatus(payment, PENDING_STATUS);
+
+        assertEquals(PENDING_STATUS, result.getStatus());
+        assertEquals(OrderStatus.WAITING_PAYMENT.getValue(), this.order.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
