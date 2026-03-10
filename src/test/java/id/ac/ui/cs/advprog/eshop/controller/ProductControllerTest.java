@@ -123,4 +123,13 @@ class ProductControllerTest {
 
     verify(service).deleteById("5");
   }
+
+  @Test
+  void deleteProductPost_callsServiceAndRedirects() throws Exception {
+    mockMvc.perform(post("/product/delete").param("productId", "6"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(PRODUCT_LIST_PATH));
+
+    verify(service).deleteById("6");
+  }
 }

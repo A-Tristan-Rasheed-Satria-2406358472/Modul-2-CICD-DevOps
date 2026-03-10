@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment List</title>
+</head>
+<body>
+<h1>Payment List</h1>
+
+<table border="1">
+  <thead>
+  <tr>
+    <th>Payment ID</th>
+    <th>Method</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="payment : ${payments}">
+    <td th:text="${payment.id}">payment-id</td>
+    <td th:text="${payment.method}">payment-method</td>
+    <td th:text="${payment.status}">payment-status</td>
+  </tr>
+  <tr th:if="${payments == null or #lists.isEmpty(payments)}">
+    <td colspan="3">No payments found.</td>
+  </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

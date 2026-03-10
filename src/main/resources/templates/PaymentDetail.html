@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Detail</title>
+</head>
+<body>
+<h1>Payment Detail</h1>
+
+<form th:action="@{/payment/detail}" method="get">
+  <div>
+    <label for="paymentId">Payment ID</label>
+    <input id="paymentId" name="paymentId" type="text" placeholder="Input payment ID">
+  </div>
+  <div>
+    <button type="submit">Find Payment</button>
+  </div>
+</form>
+
+<div th:if="${payment != null}">
+  <p>
+    Payment ID:
+    <span id="payment-id" th:text="${payment.id}">payment-id</span>
+  </p>
+  <p>
+    Method:
+    <span th:text="${payment.method}">payment-method</span>
+  </p>
+  <p>
+    Status:
+    <span id="payment-status" th:text="${payment.status}">payment-status</span>
+  </p>
+</div>
+
+</body>
+</html>

@@ -3,7 +3,6 @@ package id.ac.ui.cs.advprog.eshop.functional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,11 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import io.github.bonigarcia.seljup.SeleniumJupiter;
-
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ExtendWith(SeleniumJupiter.class)
-class HomePageFunctionalTest {
+class HomePageFunctionalTest extends FunctionalTestBase {
 
   @LocalServerPort
   private int serverPort;
@@ -32,26 +28,41 @@ class HomePageFunctionalTest {
   }
 
   @Test
-  void pageTitle_isCorrect(ChromeDriver driver) {
-    driver.get(baseUrl);
-    String pageTitle = driver.getTitle();
+  void pageTitle_isCorrect() {
+    ChromeDriver driver = createDriver();
+    try {
+      driver.get(baseUrl);
+      String pageTitle = driver.getTitle();
 
-    assertEquals("ADV Shop", pageTitle);
+      assertEquals("ADV Shop", pageTitle);
+    } finally {
+      driver.quit();
+    }
   }
 
   @Test
-  void welcomeMessage_homePage_isCorrect(ChromeDriver driver) {
-    driver.get(baseUrl);
-    String welcomeMessage = driver.findElement(By.tagName("h3")).getText();
+  void welcomeMessage_homePage_isCorrect() {
+    ChromeDriver driver = createDriver();
+    try {
+      driver.get(baseUrl);
+      String welcomeMessage = driver.findElement(By.tagName("h3")).getText();
 
-    assertEquals("Welcome", welcomeMessage);
+      assertEquals("Welcome", welcomeMessage);
+    } finally {
+      driver.quit();
+    }
   }
 
   @Test
-  void productListButton_pointsToProductListPage(ChromeDriver driver) {
-    driver.get(baseUrl);
-    String href = driver.findElement(By.id("product-list-button")).getDomProperty("href");
+  void productListButton_pointsToProductListPage() {
+    ChromeDriver driver = createDriver();
+    try {
+      driver.get(baseUrl);
+      String href = driver.findElement(By.id("product-list-button")).getDomProperty("href");
 
-    assertEquals(baseUrl + "/product/list", href);
+      assertEquals(baseUrl + "/product/list", href);
+    } finally {
+      driver.quit();
+    }
   }
 }

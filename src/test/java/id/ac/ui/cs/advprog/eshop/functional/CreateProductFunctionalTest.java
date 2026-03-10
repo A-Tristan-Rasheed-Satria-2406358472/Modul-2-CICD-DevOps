@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -18,11 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import io.github.bonigarcia.seljup.SeleniumJupiter;
-
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ExtendWith(SeleniumJupiter.class)
-class CreateProductFunctionalTest {
+class CreateProductFunctionalTest extends FunctionalTestBase {
 
     @LocalServerPort
     private int serverPort;
@@ -38,23 +34,27 @@ class CreateProductFunctionalTest {
     }
 
     @Test
-    void user_canCreateProduct_andSeeItInList(ChromeDriver driver) throws Exception {
+    void user_canCreateProduct_andSeeItInList() {
         String name = "Functional Test Product";
         String qty = "13";
+        ChromeDriver driver = createDriver();
+        try {
+            driver.get(baseUrl + "/product/create");
 
-        driver.get(baseUrl + "/product/create");
+            driver.findElement(By.id("nameInput")).sendKeys(name);
+            driver.findElement(By.id("quantityInput")).sendKeys(qty);
+            driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        driver.findElement(By.id("nameInput")).sendKeys(name);
-        driver.findElement(By.id("quantityInput")).sendKeys(qty);
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            wait.until(ExpectedConditions.titleIs("Product List"));
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(ExpectedConditions.titleIs("Product List"));
+            List<WebElement> matches = driver.findElements(By.xpath("//td[text()='" + name + "']"));
+            assertFalse(matches.isEmpty(), "Created product should appear in the product list");
 
-        List<WebElement> matches = driver.findElements(By.xpath("//td[text()='" + name + "']"));
-        assertFalse(matches.isEmpty(), "Created product should appear in the product list");
-
-        WebElement qtyCell = driver.findElement(By.xpath("//tr[td[text()='" + name + "']]/td[3]"));
-        assertEquals(qty, qtyCell.getText());
+            WebElement qtyCell = driver.findElement(By.xpath("//tr[td[text()='" + name + "']]/td[3]"));
+            assertEquals(qty, qtyCell.getText());
+        } finally {
+            driver.quit();
+        }
     }
 }

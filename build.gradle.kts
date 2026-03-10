@@ -26,6 +26,7 @@ val seleniumJavaVersion = "4.14.1"
 val seleniumJupiterVersion = "5.0.1"
 val webdrivermanagerVersion = "5.6.3"
 val junitJupiterVersion = "5.9.1"
+val testSourceSet = sourceSets.named("test")
 
 repositories {
     mavenCentral()
@@ -49,6 +50,8 @@ dependencies {
 tasks.register<Test>("unitTest") {
     description = "Runs unit tests."
     group = "verification"
+    testClassesDirs = testSourceSet.get().output.classesDirs
+    classpath = testSourceSet.get().runtimeClasspath
 
     filter {
         excludeTestsMatching("*FunctionalTest")
@@ -58,6 +61,9 @@ tasks.register<Test>("unitTest") {
 tasks.register<Test>("functionalTest") {
     description = "Runs functional tests."
     group = "verification"
+    testClassesDirs = testSourceSet.get().output.classesDirs
+    classpath = testSourceSet.get().runtimeClasspath
+    shouldRunAfter(tasks.test)
 
     filter {
         includeTestsMatching("*FunctionalTest")
@@ -69,6 +75,10 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
+tasks.check {
+    dependsOn(tasks.named("functionalTest"))
+}
+
 tasks.test {
   filter {
     excludeTestsMatching("*FunctionalTest")
@@ -77,7 +87,10 @@ tasks.test {
 }
 
 tasks.jacocoTestReport {
-  dependsOn(tasks.test)
+  dependsOn(tasks.test, tasks.named("functionalTest"))
+    executionData(fileTree(layout.buildDirectory.dir("jacoco")) {
+        include("*.exec")
+    })
     reports {
         xml.required.set(true)
         html.required.set(true)
