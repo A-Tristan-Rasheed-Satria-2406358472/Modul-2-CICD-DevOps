@@ -14,7 +14,10 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
 
     private static final String PAYMENT_METHOD_VOUCHER_CODE = "Voucher Code";
+    private static final String PAYMENT_METHOD_BANK_TRANSFER = "Bank Transfer";
     private static final String PAYMENT_DATA_VOUCHER_CODE = "voucherCode";
+    private static final String PAYMENT_DATA_BANK_NAME = "bankName";
+    private static final String PAYMENT_DATA_REFERENCE_CODE = "referenceCode";
     private static final String PAYMENT_STATUS_PENDING = "PENDING";
     private static final String PAYMENT_STATUS_SUCCESS = "SUCCESS";
     private static final String PAYMENT_STATUS_REJECTED = "REJECTED";
@@ -35,6 +38,9 @@ public class PaymentServiceImpl implements PaymentService {
             status = isValidVoucherCode(voucherCode)
                     ? PAYMENT_STATUS_SUCCESS
                     : PAYMENT_STATUS_REJECTED;
+        } else if (PAYMENT_METHOD_BANK_TRANSFER.equals(method)
+                && !isValidBankTransfer(paymentData)) {
+            status = PAYMENT_STATUS_REJECTED;
         }
 
         Payment payment = new Payment(
@@ -96,5 +102,14 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
         return numericCharacters;
+    }
+
+    private boolean isValidBankTransfer(Map<String, String> paymentData) {
+        return isNotEmpty(paymentData.get(PAYMENT_DATA_BANK_NAME))
+                && isNotEmpty(paymentData.get(PAYMENT_DATA_REFERENCE_CODE));
+    }
+
+    private boolean isNotEmpty(String value) {
+        return value != null && !value.isEmpty();
     }
 }
