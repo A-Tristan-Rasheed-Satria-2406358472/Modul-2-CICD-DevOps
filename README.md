@@ -1,3 +1,11 @@
+# Refleksi Modul 4
+
+1. Menurut saya, alur TDD pada exercise ini cukup berguna karena memaksa saya memikirkan perilaku yang diinginkan sebelum menulis implementasi. Saat menulis test lebih dulu, saya jadi lebih jelas membedakan skenario happy path, unhappy path, dan validasi data yang benar-benar penting. Proses red, green, lalu refactor juga membantu saya membangun fitur sedikit demi sedikit sehingga perubahan lebih terarah dan mudah dicek.Saya berharap kedepannya, saya menjadi lebih disiplin menulis ekspektasi test dari kebutuhan bisnis terlebih dahulu, lalu baru menambahkan implementasi sekecil mungkin agar test tersebut lolos. Saya juga perlu lebih sering mengevaluasi apakah test yang saya buat benar-benar tepat, bukan hanya sekadar mengejar agar semua test bisa hijau.
+
+2. Secara umum, test yang saya buat sudah cukup mendekati prinsip F.I.R.S.T. karena test dapat dijalankan cepat, hasilnya jelas, dan tiap skenario memeriksa satu perilaku utama. Aspek fast cukup terpenuhi karena sebagian besar test yang dibuat adalah unit test berbasis in memory repository atau mock Mockito, sehingga eksekusinya ringan. Aspek independent juga cukup baik karena setiap test memakai setup sendiri melalui @BeforeEach, walaupun saya tetap perlu waspada agar state bersama tidak bocor antar test saat jumlah test bertambah. Dari sisi repeatable dan self-validating, test saya sudah konsisten karena hasilnya tidak bergantung input manual dan verifikasinya memakai assertion yang eksplisit. Walaupun begitu, aspek timely masih bisa ditingkatkan karena dalam beberapa langkah saya menulis kode dengan sangat mengikuti panduan, bukan selalu berasal dari kebutuhan test yang saya rumuskan sendiri sejak awal. Ke depan, saya ingin lebih konsisten memastikan setiap test benar-benar kecil, independen, dan ditulis sebelum implementasi agar prinsip F.I.R.S.T. terpenuhi dengan lebih kuat
+
+(refleksi modul 3, 2 dan 1 ada dibawah ini)
+
 # Refleksi Module 3 (3.1)
 
 (relfleksi modul 1 dan 2 dibawah ini)
