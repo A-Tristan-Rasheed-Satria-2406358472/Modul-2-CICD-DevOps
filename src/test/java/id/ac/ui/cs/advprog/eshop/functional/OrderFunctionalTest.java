@@ -8,12 +8,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +93,8 @@ class OrderFunctionalTest extends FunctionalTestBase {
 
             driver.findElement(By.id("author")).sendKeys("Safira Sudrajat");
             driver.findElement(By.cssSelector("button[type='submit']")).click();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            wait.until(ExpectedConditions.titleIs("Order History List"));
 
             assertEquals("Order History List", driver.getTitle());
             assertEquals("Order History Result", driver.findElement(By.tagName("h1")).getText());
@@ -121,6 +126,8 @@ class OrderFunctionalTest extends FunctionalTestBase {
             paymentMethod.selectByValue("Voucher Code");
             driver.findElement(By.id("voucherCode")).sendKeys("ESHOP1234ABC5678");
             driver.findElement(By.cssSelector("button[type='submit']")).click();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            wait.until(ExpectedConditions.titleIs("Order Payment Result"));
 
             assertEquals("Order Payment Result", driver.getTitle());
             assertEquals("Order Payment Result", driver.findElement(By.tagName("h1")).getText());
