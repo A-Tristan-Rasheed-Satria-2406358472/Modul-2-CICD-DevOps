@@ -32,22 +32,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
-        String status = PAYMENT_STATUS_PENDING;
-        if (PAYMENT_METHOD_VOUCHER_CODE.equals(method)) {
-            String voucherCode = paymentData.get(PAYMENT_DATA_VOUCHER_CODE);
-            status = isValidVoucherCode(voucherCode)
-                    ? PAYMENT_STATUS_SUCCESS
-                    : PAYMENT_STATUS_REJECTED;
-        } else if (PAYMENT_METHOD_BANK_TRANSFER.equals(method)
-                && !isValidBankTransfer(paymentData)) {
-            status = PAYMENT_STATUS_REJECTED;
-        }
-
         Payment payment = new Payment(
                 UUID.randomUUID().toString(),
                 order,
                 method,
-                status,
+                determineInitialStatus(method, paymentData),
                 paymentData
         );
         return paymentRepository.save(payment);
@@ -76,6 +65,21 @@ public class PaymentServiceImpl implements PaymentService {
         } else if (PAYMENT_STATUS_REJECTED.equals(payment.getStatus())) {
             payment.getOrder().setStatus(ORDER_STATUS_FAILED);
         }
+    }
+
+    private String determineInitialStatus(String method, Map<String, String> paymentData) {
+        if (PAYMENT_METHOD_VOUCHER_CODE.equals(method)) {
+            String voucherCode = paymentData.get(PAYMENT_DATA_VOUCHER_CODE);
+            return isValidVoucherCode(voucherCode)
+                    ? PAYMENT_STATUS_SUCCESS
+                    : PAYMENT_STATUS_REJECTED;
+        }
+
+        if (PAYMENT_METHOD_BANK_TRANSFER.equals(method) && !isValidBankTransfer(paymentData)) {
+            return PAYMENT_STATUS_REJECTED;
+        }
+
+        return PAYMENT_STATUS_PENDING;
     }
 
     private boolean isValidVoucherCode(String voucherCode) {
