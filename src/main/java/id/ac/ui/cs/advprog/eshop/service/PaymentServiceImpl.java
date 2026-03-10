@@ -13,6 +13,12 @@ import java.util.UUID;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
+    private static final String PAYMENT_STATUS_PENDING = "PENDING";
+    private static final String PAYMENT_STATUS_SUCCESS = "SUCCESS";
+    private static final String PAYMENT_STATUS_REJECTED = "REJECTED";
+    private static final String ORDER_STATUS_SUCCESS = "SUCCESS";
+    private static final String ORDER_STATUS_FAILED = "FAILED";
+
     @Autowired
     private PaymentRepository paymentRepository;
 
@@ -22,7 +28,7 @@ public class PaymentServiceImpl implements PaymentService {
                 UUID.randomUUID().toString(),
                 order,
                 method,
-                "PENDING",
+                PAYMENT_STATUS_PENDING,
                 paymentData
         );
         return paymentRepository.save(payment);
@@ -31,11 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment setStatus(Payment payment, String status) {
         payment.setStatus(status);
-        if ("SUCCESS".equals(status)) {
-            payment.getOrder().setStatus("SUCCESS");
-        } else if ("REJECTED".equals(status)) {
-            payment.getOrder().setStatus("FAILED");
-        }
+        syncOrderStatus(payment);
         return paymentRepository.save(payment);
     }
 
@@ -47,5 +49,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<Payment> getAllPayments() {
         return paymentRepository.findAllPayments();
+    }
+
+    private void syncOrderStatus(Payment payment) {
+        if (PAYMENT_STATUS_SUCCESS.equals(payment.getStatus())) {
+            payment.getOrder().setStatus(ORDER_STATUS_SUCCESS);
+        } else if (PAYMENT_STATUS_REJECTED.equals(payment.getStatus())) {
+            payment.getOrder().setStatus(ORDER_STATUS_FAILED);
+        }
     }
 }
