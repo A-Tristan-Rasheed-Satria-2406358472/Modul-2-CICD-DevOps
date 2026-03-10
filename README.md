@@ -1,5 +1,7 @@
 # Refleksi Modul 4
 
+(refleksi modul 1, 2 dan 3 ada dibawah ini)
+
 1. Reflect based on Percival (2017) proposed self-reflective questions (in “Principles and Best
    Practice of Testing” submodule, chapter “Evaluating Your Testing Objectives”), whether this
    TDD flow is useful enough for you or not. If not, explain things that you need to do next time
@@ -12,8 +14,6 @@ Menurut saya, alur TDD pada exercise ini cukup berguna karena memaksa saya memik
    create more tests
 
 Secara umum, test yang saya buat sudah cukup mendekati prinsip F.I.R.S.T. karena test dapat dijalankan cepat, hasilnya jelas, dan tiap skenario memeriksa satu perilaku utama. Aspek fast cukup terpenuhi karena sebagian besar test yang dibuat adalah unit test berbasis in-memory repository atau mock Mockito, sehingga waktu eksekusinya relatif singkat dan tidak membutuhkan setup eksternal yang berat. Aspek independent juga cukup baik karena setiap test memakai setup sendiri melalui @BeforeEach, sehingga satu test tidak seharusnya bergantung pada hasil test lain. Namun saya tetap perlu berhati-hati, terutama saat mulai menambah functional test dan shared fixture, karena di area itu risiko kebocoran state dan duplikasi setup menjadi lebih besar. Dari sisi repeatable dan self-validating, test saya sudah cukup konsisten karena hasilnya tidak bergantung pada input manual dan seluruh ekspektasi diverifikasi memakai assertion yang eksplisit. Aspek timely juga sudah mulai terlihat karena banyak implementasi memang lahir setelah ada test yang gagal terlebih dahulu, walaupun saya mengakui beberapa langkah masih terlalu dipengaruhi tutorial, bukan sepenuhnya berasal dari analisis saya sendiri terhadap requirement. Karena itu, saya belum merasa semua test saya sudah memenuhi prinsip F.I.R.S.T. secara sempurna, tetapi arahnya sudah benar. Ke depan, saya ingin lebih konsisten menjaga agar setiap test tetap kecil, fokus pada satu perilaku, tidak terlalu bergantung pada detail implementasi yang ada, dan benar-benar ditulis sebelum implementasi dimulai. selain itu juga agar lebih disiplin meninjau ulang apakah sebuah test masih sederhana dan maintainable ketika jumlah fitur bertambah, supaya kualitas test suite tetap baik dalam jangka panjang
-
-(refleksi modul 3, 2 dan 1 ada dibawah ini)
 
 ---
 
