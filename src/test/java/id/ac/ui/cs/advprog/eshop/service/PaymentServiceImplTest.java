@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -67,6 +68,33 @@ class PaymentServiceImplTest {
         assertNotNull(result);
         assertEquals("Voucher Code", result.getMethod());
         assertEquals(this.paymentData, result.getPaymentData());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
+    void testAddPaymentWithValidVoucherCodeSetsSuccessStatus() {
+        doAnswer(invocation -> invocation.getArgument(0))
+                .when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(this.order, "Voucher Code", this.paymentData);
+
+        assertNotNull(result);
+        assertEquals("SUCCESS", result.getStatus());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
+    void testAddPaymentWithInvalidVoucherCodeSetsRejectedStatus() {
+        Map<String, String> invalidPaymentData = new HashMap<>();
+        invalidPaymentData.put("voucherCode", "INVALID");
+
+        doAnswer(invocation -> invocation.getArgument(0))
+                .when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(this.order, "Voucher Code", invalidPaymentData);
+
+        assertNotNull(result);
+        assertEquals("REJECTED", result.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 
