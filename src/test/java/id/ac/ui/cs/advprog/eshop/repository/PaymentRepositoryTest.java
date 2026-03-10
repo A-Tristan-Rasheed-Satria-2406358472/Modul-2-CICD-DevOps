@@ -53,6 +53,28 @@ class PaymentRepositoryTest {
     }
 
     @Test
+    void testSaveUpdateDoesNotCreateDuplicatePayment() {
+        paymentRepository.save(payment);
+
+        Map<String, String> updatedPaymentData = new HashMap<>();
+        updatedPaymentData.put("voucherCode", "ESHOP9999ABC5678");
+        Payment updatedPayment = new Payment(
+                "payment-1",
+                "Voucher Code",
+                "REJECTED",
+                updatedPaymentData
+        );
+
+        Payment result = paymentRepository.save(updatedPayment);
+        List<Payment> payments = paymentRepository.findAllPayments();
+
+        assertEquals("payment-1", result.getId());
+        assertEquals(1, payments.size());
+        assertEquals("REJECTED", payments.get(0).getStatus());
+        assertEquals("ESHOP9999ABC5678", payments.get(0).getPaymentData().get("voucherCode"));
+    }
+
+    @Test
     void testFindAllPaymentsReturnsSavedPayments() {
         paymentRepository.save(payment);
 
