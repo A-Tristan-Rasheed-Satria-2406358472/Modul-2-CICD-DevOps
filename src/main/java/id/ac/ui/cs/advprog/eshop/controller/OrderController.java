@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Payment;
@@ -21,6 +22,7 @@ import id.ac.ui.cs.advprog.eshop.service.PaymentService;
 public class OrderController {
 
   private static final String REDIRECT_ORDER_HISTORY = "redirect:/order/history";
+  private static final String AUTHOR_ATTRIBUTE = "author";
 
   private final OrderService orderService;
   private final PaymentService paymentService;
@@ -41,10 +43,18 @@ public class OrderController {
   }
 
   @PostMapping("/history/search")
-  public String orderHistoryPost(@RequestParam("author") String author, Model model) {
-    List<Order> orders = orderService.findAllByAuthor(author);
-    model.addAttribute("author", author);
-    model.addAttribute("orders", orders);
+  public String orderHistoryPost(@RequestParam("author") String author, RedirectAttributes redirectAttributes) {
+    redirectAttributes.addAttribute(AUTHOR_ATTRIBUTE, author);
+    return "redirect:/order/history/result";
+  }
+
+  @GetMapping("/history/result")
+  public String orderHistoryResult(@RequestParam(value = "author", required = false) String author, Model model) {
+    if (author != null) {
+      List<Order> orders = orderService.findAllByAuthor(author);
+      model.addAttribute(AUTHOR_ATTRIBUTE, author);
+      model.addAttribute("orders", orders);
+    }
     return "OrderHistoryList";
   }
 
@@ -63,7 +73,7 @@ public class OrderController {
       @PathVariable String orderId,
       @RequestParam("method") String method,
       @RequestParam Map<String, String> paymentData,
-      Model model) {
+      RedirectAttributes redirectAttributes) {
     Order order = orderService.findById(orderId);
     if (order == null) {
       return REDIRECT_ORDER_HISTORY;
@@ -71,7 +81,13 @@ public class OrderController {
 
     paymentData.remove("method");
     Payment payment = paymentService.addPayment(order, method, paymentData);
-    model.addAttribute("paymentId", payment.getId());
+    redirectAttributes.addAttribute("paymentId", payment.getId());
+    return "redirect:/order/pay-result";
+  }
+
+  @GetMapping("/pay-result")
+  public String payOrderResult(@RequestParam String paymentId, Model model) {
+    model.addAttribute("paymentId", paymentId);
     return "OrderPayResult";
   }
 }
